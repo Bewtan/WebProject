@@ -19,6 +19,11 @@
                 <span asp-validation-for="RoomId" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="ClientsIDs" class="control-label">Room Number</label>
+                <select asp-for="ClientsIDs" class="form-control" asp-items="ViewBag.Client"></select>
+                <span asp-validation-for="ClientsIDs" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="DateOfArrival" class="control-label"></label>
                 <input asp-for="DateOfArrival" class="form-control" />
                 <span asp-validation-for="DateOfArrival" class="text-danger"></span>

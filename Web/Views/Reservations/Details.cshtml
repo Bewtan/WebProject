@@ -30,17 +30,29 @@
                 <tr>
                     <th>First Name</th>
                     <th>Last Name</th>
+                    <th>Phone Number</th>
+                    <th>Email</th>
+                    <th>IsAdult</th>
                 </tr>
                 @foreach (var client in Model.Clients)
                 {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => client.FirstName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => client.LastName)
-                        </td>
-                    </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => client.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => client.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => client.PhoneNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => client.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => client.IsAdult)
+                </td>
+            </tr>
                 }
             </table>
         </dd>

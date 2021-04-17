@@ -18,9 +18,9 @@
                 <span asp-validation-for="RoomId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label for="Clients" class="control-label">Room Number</label>
-                <select for="Clients" class="form-control" multiple="multiple" asp-items="ViewBag.Client"></select>
-                <span validation-for="Clients" class="text-danger"></span>
+                <label asp-for="ClientsIDs" class="control-label">Room Number</label>
+                <select asp-for="ClientsIDs" class="form-control" asp-items="ViewBag.Client"></select>
+                <span asp-validation-for="ClientsIDs" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DateOfArrival" class="control-label"></label>
