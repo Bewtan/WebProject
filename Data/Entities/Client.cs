@@ -14,7 +14,6 @@ namespace Data.Entities
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public bool IsAdult { get; set; }
-        public int ReservationId { get; set; }
-        public virtual Reservation Reservation { get; set; }
+        public virtual ICollection<Reservation> Reservations { get; set; }
     }
 }

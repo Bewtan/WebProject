@@ -12,11 +12,11 @@ namespace Data.Entities
         public string Firstname { get; set; }
         public string Middlename { get; set; }
         public string Lastname { get; set; }
-        public string EGN { get; set; }
+        public string PersonalID { get; set; }
         public bool IsActive { get; set; }
         public bool IsAdmin { get; set; }
         public DateTime DateOfEmployment { get; set; }
-        public DateTime DateOfDischargement { get; set; }
+        public DateTime? DateOfDischargement { get; set; }
         public virtual ICollection<Reservation> Reservations { get; set; }
 
     }

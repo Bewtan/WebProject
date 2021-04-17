@@ -19,6 +19,21 @@ namespace Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.5")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("ClientReservation", b =>
+                {
+                    b.Property<int>("ClientsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReservationsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ClientsId", "ReservationsId");
+
+                    b.HasIndex("ReservationsId");
+
+                    b.ToTable("ClientReservation");
+                });
+
             modelBuilder.Entity("Data.Entities.Client", b =>
                 {
                     b.Property<int>("Id")
@@ -41,12 +56,7 @@ namespace Data.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReservationId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ReservationId");
 
                     b.ToTable("Clients");
                 });
@@ -108,8 +118,8 @@ namespace Data.Migrations
                     b.Property<decimal>("PriceForKid")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -128,14 +138,11 @@ namespace Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateOfDischargement")
+                    b.Property<DateTime?>("DateOfDischargement")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfEmployment")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("EGN")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -148,6 +155,9 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
 
                     b.Property<string>("Lastname")
@@ -171,6 +181,9 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PersonalID")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -333,15 +346,19 @@ namespace Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Data.Entities.Client", b =>
+            modelBuilder.Entity("ClientReservation", b =>
                 {
-                    b.HasOne("Data.Entities.Reservation", "Reservation")
-                        .WithMany("Clients")
-                        .HasForeignKey("ReservationId")
+                    b.HasOne("Data.Entities.Client", null)
+                        .WithMany()
+                        .HasForeignKey("ClientsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Reservation");
+                    b.HasOne("Data.Entities.Reservation", null)
+                        .WithMany()
+                        .HasForeignKey("ReservationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Data.Entities.Reservation", b =>
@@ -410,11 +427,6 @@ namespace Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Data.Entities.Reservation", b =>
-                {
-                    b.Navigation("Clients");
                 });
 
             modelBuilder.Entity("Data.Entities.Room", b =>

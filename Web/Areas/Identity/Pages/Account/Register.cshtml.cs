@@ -60,7 +60,7 @@ namespace Web.Areas.Identity.Pages.Account
 
             [Required]
             [MaxLength(10, ErrorMessage = "EGN must be 10 digits"), MinLength(10)]
-            public string EGN { get; set; }
+            public string PersonalID { get; set; }
 
 
             [Required]
@@ -105,7 +105,7 @@ namespace Web.Areas.Identity.Pages.Account
                     Firstname = Input.Firstname,
                     Middlename = Input.Middlename,
                     Lastname = Input.Lastname,
-                    EGN = Input.EGN,
+                    PersonalID = Input.PersonalID,
                     PhoneNumber = Input.PhoneNumber,
                     DateOfEmployment = Input.DateOfEmployment,
                     IsActive = true

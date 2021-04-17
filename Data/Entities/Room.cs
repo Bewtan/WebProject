@@ -6,13 +6,17 @@ using System.Threading.Tasks;
 
 namespace Data.Entities
 {
+    public enum RoomType
+    {
+        TwoBeds, Apartment, Doublebed, Penthouse, Maisonette
+    }
     public class Room
     {
         public int Id { get; set; }
 
         public int Capacity { get; set; }
 
-        public string Type { get; set; }
+        public RoomType Type { get; set; }
 
         public decimal PriceForAdult { get; set; }
 

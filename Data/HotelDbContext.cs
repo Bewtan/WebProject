@@ -43,8 +43,7 @@ namespace Data
                 .HasForeignKey<Reservation>(res => res.RoomId);
             modelBuilder.Entity<Reservation>()
                 .HasMany(res => res.Clients)
-                .WithOne(c => c.Reservation)
-                .HasForeignKey(c => c.ReservationId);
+                .WithMany(c => c.Reservations);
         }
     }
 }

@@ -6,6 +6,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\Clients\**" />
+    <Compile Remove="Models\Reservations\**" />
+    <Compile Remove="Models\Rooms\**" />
+    <Compile Remove="Models\Users\**" />
+    <Content Remove="Models\Clients\**" />
+    <Content Remove="Models\Reservations\**" />
+    <Content Remove="Models\Rooms\**" />
+    <Content Remove="Models\Users\**" />
+    <EmbeddedResource Remove="Models\Clients\**" />
+    <EmbeddedResource Remove="Models\Reservations\**" />
+    <EmbeddedResource Remove="Models\Rooms\**" />
+    <EmbeddedResource Remove="Models\Users\**" />
+    <None Remove="Models\Clients\**" />
+    <None Remove="Models\Reservations\**" />
+    <None Remove="Models\Rooms\**" />
+    <None Remove="Models\Users\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.5" />
@@ -20,13 +39,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Data\Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Clients\" />
-    <Folder Include="Models\Reservations\" />
-    <Folder Include="Models\Users\" />
-    <Folder Include="Models\Rooms\" />
   </ItemGroup>
 
 </Project>
