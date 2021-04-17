@@ -8,6 +8,10 @@ namespace Data.Entities
 {
     public class Client
     {
+        public Client()
+        {
+            Reservations = new HashSet<Reservation>();
+        }
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

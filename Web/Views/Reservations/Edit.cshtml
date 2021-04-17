@@ -15,13 +15,8 @@
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="RoomId">Room Number</label>
-                <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
+                <select asp-for="RoomId" class="form-control" asp-items="ViewBag.Room"></select>
                 <span asp-validation-for="RoomId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DateOfArrival" class="control-label"></label>
@@ -42,11 +37,6 @@
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsAllInclusive" /> @Html.DisplayNameFor(model => model.IsAllInclusive)
                 </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="Cost" class="control-label"></label>
-                <input asp-for="Cost" class="form-control" disabled>
-                <span asp-validation-for="Cost" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

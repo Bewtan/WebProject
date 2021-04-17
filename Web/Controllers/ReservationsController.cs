@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Data;
 using Data.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Web.Controllers
 {
     public class ReservationsController : Controller
     {
         private readonly HotelDbContext _context;
+        protected UserManager<User> _userManager { get; set; }
 
-        public ReservationsController(HotelDbContext context)
+
+        public ReservationsController(HotelDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Reservations
@@ -37,6 +41,7 @@ namespace Web.Controllers
             var reservation = await _context.Reservations
                 .Include(r => r.Room)
                 .Include(r => r.User)
+                .Include(r => r.Clients)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (reservation == null)
             {
@@ -49,8 +54,21 @@ namespace Web.Controllers
         // GET: Reservations/Create
         public IActionResult Create()
         {
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["Room"] = new List<SelectListItem>();
+            foreach(var room in _context.Rooms)
+            {
+                ViewBag.Room.Add(new SelectListItem { Text = room.Number.ToString(), Value = room.Id.ToString() });
+            }
+            ViewData["User"] = new List<SelectListItem>();
+            foreach (var user in _context.Users)
+            {
+                ViewBag.User.Add(new SelectListItem { Text = user.UserName, Value = user.Id});
+            }
+            ViewData["Client"] = new List<SelectListItem>();
+            foreach (var client in _context.Clients)
+            {
+                ViewBag.Client.Add(new SelectListItem { Text = client.FirstName + client.LastName, Value = client.Id.ToString() });
+            }
             return View();
         }
 
@@ -59,16 +77,29 @@ namespace Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,RoomId,UserId,DateOfArrival,DateOfLeaving,IsBreakfastIncluded,IsAllInclusive,Cost")] Reservation reservation)
+        public async Task<IActionResult> Create([Bind("Id,RoomId,Clients,DateOfArrival,DateOfLeaving,IsBreakfastIncluded,IsAllInclusive")] Reservation reservation)
         {
             if (ModelState.IsValid)
             {
+                var current_User = _userManager.GetUserAsync(HttpContext.User).Result;
+                reservation.UserId = current_User.Id;
+               
+                //reservation.Cost = CalculateCost(reservation);
                 _context.Add(reservation);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id", reservation.RoomId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", reservation.UserId);
+
+            ViewData["Room"] = new List<SelectListItem>();
+            foreach (var room in _context.Rooms)
+            {
+                ViewBag.Room.Add(new SelectListItem { Text = room.Number.ToString(), Value = room.Id.ToString() });
+            }
+            ViewData["User"] = new List<SelectListItem>();
+            foreach (var user in _context.Users)
+            {
+                ViewBag.User.Add(new SelectListItem { Text = user.UserName, Value = user.Id });
+            }
             return View(reservation);
         }
 
@@ -85,8 +116,17 @@ namespace Web.Controllers
             {
                 return NotFound();
             }
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id", reservation.RoomId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", reservation.UserId);
+
+            ViewData["Room"] = new List<SelectListItem>();
+            foreach (var room in _context.Rooms)
+            {
+                ViewBag.Room.Add(new SelectListItem { Text = room.Number.ToString(), Value = room.Id.ToString() });
+            }
+            ViewData["User"] = new List<SelectListItem>();
+            foreach (var user in _context.Users)
+            {
+                ViewBag.User.Add(new SelectListItem { Text = user.UserName, Value = user.Id });
+            }
             return View(reservation);
         }
 
@@ -95,7 +135,7 @@ namespace Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,RoomId,UserId,DateOfArrival,DateOfLeaving,IsBreakfastIncluded,IsAllInclusive,Cost")] Reservation reservation)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,RoomId,DateOfArrival,DateOfLeaving,IsBreakfastIncluded,IsAllInclusive")] Reservation reservation)
         {
             if (id != reservation.Id)
             {
@@ -106,6 +146,9 @@ namespace Web.Controllers
             {
                 try
                 {
+                    var current_User = _userManager.GetUserAsync(HttpContext.User).Result;
+                    reservation.UserId = current_User.Id;
+                    reservation.Cost = CalculateCost(reservation);
                     _context.Update(reservation);
                     await _context.SaveChangesAsync();
                 }
@@ -122,8 +165,17 @@ namespace Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id", reservation.RoomId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", reservation.UserId);
+
+            ViewData["Room"] = new List<SelectListItem>();
+            foreach (var room in _context.Rooms)
+            {
+                ViewBag.Room.Add(new SelectListItem { Text = room.Number.ToString(), Value = room.Id.ToString() });
+            }
+            ViewData["User"] = new List<SelectListItem>();
+            foreach (var user in _context.Users)
+            {
+                ViewBag.User.Add(new SelectListItem { Text = user.UserName, Value = user.Id });
+            }
             return View(reservation);
         }
 
@@ -161,6 +213,21 @@ namespace Web.Controllers
         private bool ReservationExists(int id)
         {
             return _context.Reservations.Any(e => e.Id == id);
+        }
+        private decimal CalculateCost(Reservation reservation) {
+            int Adults = 0;
+            int Kids = 0;
+            decimal Cost = 0;
+            foreach(var client in reservation.Clients)
+            {
+                if (client.IsAdult == true)
+                    Adults++;
+                else
+                    Kids++;
+            }
+            
+            Cost = (Adults * reservation.Room.PriceForAdult + Kids * reservation.Room.PriceForKid) * (decimal)(reservation.DateOfLeaving - reservation.DateOfArrival).TotalDays;
+            return Cost;
         }
     }
 }
