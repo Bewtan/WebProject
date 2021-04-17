@@ -54,7 +54,7 @@ namespace Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Firstname,Middlename,Lastname,PersonalID,IsActive,IsAdmin,DateOfEmployment,DateOfDischargement,Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] User user)
+        public async Task<IActionResult> Create([Bind("Firstname,Middlename,Lastname,PersonalID,IsActive,IsAdmin,DateOfEmployment,DateOfDischargement,Id,UserName,Email,PhoneNumber")] User user)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Firstname,Middlename,Lastname,PersonalID,IsActive,IsAdmin,DateOfEmployment,DateOfDischargement,Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] User user)
+        public async Task<IActionResult> Edit(string id, [Bind("Firstname,Middlename,Lastname,PersonalID,IsActive,IsAdmin,DateOfEmployment,DateOfDischargement,Id,UserName,,Email,PhoneNumber")] User user)
         {
             if (id != user.Id)
             {

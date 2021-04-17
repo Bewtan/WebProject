@@ -163,6 +163,8 @@ namespace Web.Controllers
                     var current_User = _userManager.GetUserAsync(HttpContext.User).Result;
                     reservation.UserId = current_User.Id;
                     List<int> ids = reservation.ClientsIDs.ToList<int>();
+                    _context.Update(reservation);
+                    _context.SaveChanges();
                     reservation = _context.Reservations.Include(r => r.Clients).First(i => i.Id == reservation.Id);
                     reservation.Clients.Clear();
                     _context.SaveChanges(); //pain
