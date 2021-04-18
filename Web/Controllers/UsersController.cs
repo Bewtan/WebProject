@@ -7,22 +7,44 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Data;
 using Data.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly HotelDbContext _context;
-
-        public UsersController(HotelDbContext context)
+        protected UserManager<User> _userManager { get; set; }
+        public UsersController(HotelDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Users
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string currentFilter,string searchString,int? pageNumber)
         {
-            return View(await _context.Users.ToListAsync());
+            if (searchString != null)
+                pageNumber = 1;
+            else
+                searchString = currentFilter;
+            
+            ViewData["CurrentFilter"] = searchString;
+            var users = from u in _context.Users
+                           select u;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(u => u.Lastname.Contains(searchString)
+                                       || u.Middlename.Contains(searchString)
+                                       || u.Firstname.Contains(searchString)
+                                       || u.UserName.Contains(searchString)
+                                       || u.Email.Contains(searchString));
+            }
+            int pageSize = 5;
+
+            return View(await PaginatedList<User>.CreateAsync(users.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Users/Details/5
@@ -54,11 +76,13 @@ namespace Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Firstname,Middlename,Lastname,PersonalID,IsActive,IsAdmin,DateOfEmployment,DateOfDischargement,Id,UserName,Email,PhoneNumber")] User user)
+        public async Task<IActionResult> Create([Bind("Firstname,Middlename,Lastname,PersonalID,IsActive,IsAdmin,DateOfEmployment,DateOfDischargement,UserName,Email,PhoneNumber")] User user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
+                user.Id = Guid.NewGuid().ToString();
+                user.SecurityStamp = Guid.NewGuid().ToString();
+                _context.Users.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -86,7 +110,7 @@ namespace Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Firstname,Middlename,Lastname,PersonalID,IsActive,IsAdmin,DateOfEmployment,DateOfDischargement,Id,UserName,,Email,PhoneNumber")] User user)
+        public async Task<IActionResult> Edit(string id, [Bind("Firstname,Middlename,Lastname,PersonalID,IsActive,IsAdmin,DateOfEmployment,DateOfDischargement,Id,UserName,Email,PhoneNumber")] User user)
         {
             if (id != user.Id)
             {
@@ -97,7 +121,30 @@ namespace Web.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    var User = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+                    User.Firstname = user.Firstname;
+                    User.Middlename = user.Middlename;
+                    User.Lastname = user.Lastname;
+                    User.PersonalID = user.PersonalID;
+                    User.IsActive = user.IsActive;
+                    User.IsAdmin = user.IsAdmin;
+                    User.DateOfEmployment = user.DateOfEmployment;
+                    User.DateOfDischargement = user.DateOfDischargement;
+                    User.UserName = user.UserName;
+                    User.Email = user.Email;
+                    User.PhoneNumber = user.PhoneNumber;
+                    User.SecurityStamp = Guid.NewGuid().ToString();
+                    if ( User.DateOfDischargement <= DateTime.Today)
+                    {
+                        User.LockoutEnabled = true;
+                        User.LockoutEnd = DateTime.MaxValue;
+                        User.IsActive = false;
+                    }
+                    if (User.IsAdmin)
+                    {
+                        await _userManager.AddToRoleAsync(user, "Admin");
+                    }
+                    _context.Users.Update(User);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

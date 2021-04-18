@@ -108,7 +108,8 @@ namespace Web.Areas.Identity.Pages.Account
                     PersonalID = Input.PersonalID,
                     PhoneNumber = Input.PhoneNumber,
                     DateOfEmployment = Input.DateOfEmployment,
-                    IsActive = true
+                    IsActive = true,
+                    SecurityStamp = Guid.NewGuid().ToString()
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                  if (result.Succeeded)
@@ -116,7 +117,8 @@ namespace Web.Areas.Identity.Pages.Account
                       if (this._hotelDbContext.Users.Count() == 1)
                       {
                           await _userManager.AddToRoleAsync(user, "Admin");
-                          //await _userManager.UpdateAsync(user);
+                            user.IsAdmin = true;
+                          await _userManager.UpdateAsync(user);
                       }
 
                       else

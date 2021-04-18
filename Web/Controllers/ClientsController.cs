@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Data;
 using Data.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers
 {
+    [Authorize]
     public class ClientsController : Controller
     {
         private readonly HotelDbContext _context;
@@ -20,9 +22,24 @@ namespace Web.Controllers
         }
 
         // GET: Clients
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string currentFilter, string searchString, int? pageNumber)
         {
-            return View(await _context.Clients.ToListAsync());
+            if (searchString != null)
+                pageNumber = 1;
+            else
+                searchString = currentFilter;
+
+            ViewData["CurrentFilter"] = searchString;
+            var clients = from u in _context.Clients
+                        select u;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                clients = clients.Where(u => u.LastName.Contains(searchString)
+                                       || u.FirstName.Contains(searchString));
+            }
+            int pageSize = 5;
+
+            return View(await PaginatedList<Client>.CreateAsync(clients.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Clients/Details/5
